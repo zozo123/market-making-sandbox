@@ -33,10 +33,10 @@ export default class AdverseSelection {
     const controls = $controls(this.section);
     const viz = $viz(this.section);
 
-    this.params = { halfSpread: 0.5, A: 140, k: 1.5, T: 300, dt: 0.5, sigma: 0.4, alpha: 0.15, jumpSize: 0.2 };
+    this.params = { halfSpread: 0.5, A: 140, k: 1.5, T: 1, dt: 0.005, sigma: 2, alpha: 0.15, jumpSize: 0.4 };
 
     const sa = makeSlider({ label: 'informed share α', min: 0, max: 0.6, step: 0.02, value: this.params.alpha, format: (v) => v.toFixed(2), onChange: (v) => { this.params.alpha = v; } });
-    const sj = makeSlider({ label: 'informed jump size', min: 0.05, max: 0.8, step: 0.05, value: this.params.jumpSize, format: (v) => v.toFixed(2), onChange: (v) => { this.params.jumpSize = v; } });
+    const sj = makeSlider({ label: 'informed jump size', min: 0.05, max: 1.2, step: 0.05, value: this.params.jumpSize, format: (v) => v.toFixed(2), onChange: (v) => { this.params.jumpSize = v; } });
     const sd = makeSlider({ label: 'half-spread δ', min: 0.1, max: 2, step: 0.05, value: this.params.halfSpread, format: (v) => v.toFixed(2), onChange: (v) => { this.params.halfSpread = v; } });
 
     this.readout = makeReadout([

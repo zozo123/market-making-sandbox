@@ -54,12 +54,12 @@ export default class AvellanedaStoikov {
     const controls = $controls(this.section);
     const viz = $viz(this.section);
 
-    this.params = { gamma: 0.1, sigma: 0.5, k: 1.5, T: 300, dt: 0.5, A: 140, halfSpread: 0.5, episodes: 600 };
+    this.params = { gamma: 0.1, sigma: 2, k: 1.5, T: 1, dt: 0.005, A: 140, halfSpread: 0.5, episodes: 500 };
 
-    const sg = makeSlider({ label: 'risk aversion γ', min: 0.01, max: 0.6, step: 0.01, value: this.params.gamma, format: (v) => v.toFixed(2), onChange: (v) => { this.params.gamma = v; } });
-    const ss = makeSlider({ label: 'volatility σ', min: 0.05, max: 2, step: 0.05, value: this.params.sigma, format: (v) => v.toFixed(2), onChange: (v) => { this.params.sigma = v; } });
+    const sg = makeSlider({ label: 'risk aversion γ', min: 0.01, max: 0.4, step: 0.01, value: this.params.gamma, format: (v) => v.toFixed(2), onChange: (v) => { this.params.gamma = v; } });
+    const ss = makeSlider({ label: 'volatility σ', min: 0.1, max: 4, step: 0.1, value: this.params.sigma, format: (v) => v.toFixed(1), onChange: (v) => { this.params.sigma = v; } });
     const sk = makeSlider({ label: 'fill-decay k', min: 0.5, max: 4, step: 0.1, value: this.params.k, format: (v) => v.toFixed(1), onChange: (v) => { this.params.k = v; } });
-    const sT = makeSlider({ label: 'horizon T', min: 60, max: 600, step: 30, value: this.params.T, format: (v) => v.toFixed(0), onChange: (v) => { this.params.T = v; } });
+    const sT = makeSlider({ label: 'horizon T', min: 0.2, max: 3, step: 0.1, value: this.params.T, format: (v) => v.toFixed(1), onChange: (v) => { this.params.T = v; } });
 
     this.readout = makeReadout([
       { key: 'sym mean P&L', value: '—' },

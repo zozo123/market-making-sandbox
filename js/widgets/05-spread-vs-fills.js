@@ -28,15 +28,15 @@ export default class SpreadVsFills {
     const controls = $controls(this.section);
     const viz = $viz(this.section);
 
-    this.params = { A: 140, k: 1.5, T: 300, dt: 0.5, sigma: 0.5, gamma: 0.1, episodes: 200 };
+    this.params = { A: 140, k: 1.5, T: 1, dt: 0.005, sigma: 2, gamma: 0.1, episodes: 150 };
 
     const sk = makeSlider({
       label: 'fill-decay k', min: 0.5, max: 4, step: 0.1, value: this.params.k,
       format: (v) => v.toFixed(1), onChange: (v) => { this.params.k = v; this.run(); },
     });
     const ss = makeSlider({
-      label: 'volatility σ', min: 0, max: 2, step: 0.05, value: this.params.sigma,
-      format: (v) => v.toFixed(2), onChange: (v) => { this.params.sigma = v; this.run(); },
+      label: 'volatility σ', min: 0, max: 4, step: 0.1, value: this.params.sigma,
+      format: (v) => v.toFixed(1), onChange: (v) => { this.params.sigma = v; this.run(); },
     });
     const sg = makeSlider({
       label: 'skew γ', min: 0, max: 0.4, step: 0.01, value: this.params.gamma,

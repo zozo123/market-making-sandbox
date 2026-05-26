@@ -37,28 +37,28 @@ export default class Kyle {
     const { sigmaV, sigmaU } = this.params;
     const lambda = kyleLambda(sigmaV, sigmaU);
     const beta = kyleBeta(sigmaV, sigmaU);
-    // Sample (y, p) where y = β(V-μ) + u, p = μ + λ y
+    // Sample (y, V) where y = β·V + u. The maker can't see V, only y, and prices
+    // at p = λy = E[V|y]. The scatter is realized V; the line is the maker's
+    // price. Dispersion of V around the line is the regret the maker can't avoid.
     const rng = mulberry32(61000);
-    const ys = [], ps = [];
+    const ys = [], vs = [];
     for (let i = 0; i < this.params.samples; i++) {
       const v = sigmaV * randn(rng);
       const u = sigmaU * randn(rng);
-      const x = beta * v;
-      const y = x + u;
-      const p = lambda * y;
-      ys.push(y); ps.push(p);
+      const y = beta * v + u;
+      ys.push(y); vs.push(v);
     }
     const yMin = Math.min(...ys), yMax = Math.max(...ys);
     const lineY = [yMin, yMax];
     const lineP = lineY.map((y) => lambda * y);
 
     Plotly.react(this.plotEl, [
-      { x: ys, y: ps, type: 'scatter', mode: 'markers', marker: { color: 'rgba(45,212,191,0.45)', size: 5 }, name: 'auctions' },
-      { x: lineY, y: lineP, type: 'scatter', mode: 'lines', line: { color: '#fb7185', width: 2 }, name: 'p = λ y' },
+      { x: ys, y: vs, type: 'scatter', mode: 'markers', marker: { color: 'rgba(45,212,191,0.45)', size: 5 }, name: 'realized V' },
+      { x: lineY, y: lineP, type: 'scatter', mode: 'lines', line: { color: '#fb7185', width: 2 }, name: 'p = λy' },
     ], plotlyTheme({
       showlegend: true, legend: { x: 0.55, y: 0.05, font: { color: '#8b97ad', size: 10 } },
       xaxis: { gridcolor: '#232c3b', title: 'net order flow y', titlefont: { size: 11 }, zerolinecolor: '#2f3b50' },
-      yaxis: { gridcolor: '#232c3b', title: 'price impact p − μ', titlefont: { size: 11 }, zerolinecolor: '#2f3b50' },
+      yaxis: { gridcolor: '#232c3b', title: 'value − μ  /  price impact', titlefont: { size: 11 }, zerolinecolor: '#2f3b50' },
     }), plotlyConfig);
 
     this.readout.set('λ', lambda.toFixed(3));

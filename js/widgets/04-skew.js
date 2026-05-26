@@ -46,15 +46,15 @@ export default class Skew {
     const controls = $controls(this.section);
     const viz = $viz(this.section);
 
-    this.params = { halfSpread: 0.5, A: 140, k: 1.5, T: 300, dt: 0.5, sigma: 0.5, gamma: 0.15 };
+    this.params = { halfSpread: 0.5, A: 140, k: 1.5, T: 1, dt: 0.005, sigma: 2, gamma: 0.1 };
 
     const sg = makeSlider({
-      label: 'skew strength γ', min: 0, max: 0.6, step: 0.01, value: this.params.gamma,
+      label: 'skew strength γ', min: 0, max: 0.4, step: 0.01, value: this.params.gamma,
       format: (v) => v.toFixed(2), onChange: (v) => { this.params.gamma = v; },
     });
     const ss = makeSlider({
-      label: 'volatility σ', min: 0, max: 2, step: 0.05, value: this.params.sigma,
-      format: (v) => v.toFixed(2), onChange: (v) => { this.params.sigma = v; },
+      label: 'volatility σ', min: 0, max: 4, step: 0.1, value: this.params.sigma,
+      format: (v) => v.toFixed(1), onChange: (v) => { this.params.sigma = v; },
     });
     const sd = makeSlider({
       label: 'half-spread δ', min: 0.1, max: 2, step: 0.05, value: this.params.halfSpread,
@@ -94,8 +94,8 @@ export default class Skew {
     const viz = $viz(this.section);
     spinner(viz, true);
     requestAnimationFrame(() => {
-      const base = monteCarlo({ ...this.params, gamma: 0 }, 800);
-      const skewed = monteCarlo({ ...this.params }, 800);
+      const base = monteCarlo({ ...this.params, gamma: 0 }, 600);
+      const skewed = monteCarlo({ ...this.params }, 600);
 
       const sb = stats(base.pnl);
       const ss = stats(skewed.pnl);

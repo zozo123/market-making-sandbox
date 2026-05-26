@@ -31,19 +31,19 @@ export default class InventoryRisk {
     const controls = $controls(this.section);
     const viz = $viz(this.section);
 
-    this.params = { halfSpread: 0.5, A: 140, k: 1.5, T: 300, dt: 0.5, sigma: 0.5 };
+    this.params = { halfSpread: 0.5, A: 140, k: 1.5, T: 1, dt: 0.005, sigma: 2 };
 
     const s1 = makeSlider({
       label: 'half-spread δ', min: 0.1, max: 2, step: 0.05, value: this.params.halfSpread,
       format: (v) => v.toFixed(2), onChange: (v) => { this.params.halfSpread = v; },
     });
     const s2 = makeSlider({
-      label: 'volatility σ', min: 0, max: 2, step: 0.05, value: this.params.sigma,
-      format: (v) => v.toFixed(2), onChange: (v) => { this.params.sigma = v; },
+      label: 'volatility σ', min: 0, max: 4, step: 0.1, value: this.params.sigma,
+      format: (v) => v.toFixed(1), onChange: (v) => { this.params.sigma = v; },
     });
     const s3 = makeSlider({
-      label: 'horizon T (s)', min: 60, max: 600, step: 30, value: this.params.T,
-      format: (v) => v.toFixed(0), onChange: (v) => { this.params.T = v; },
+      label: 'horizon T', min: 0.2, max: 3, step: 0.1, value: this.params.T,
+      format: (v) => v.toFixed(1), onChange: (v) => { this.params.T = v; },
     });
 
     this.readout = makeReadout([

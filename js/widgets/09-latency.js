@@ -66,11 +66,11 @@ export default class Latency {
   init() {
     const controls = $controls(this.section);
     const viz = $viz(this.section);
-    this.params = { sigma: 0.6, halfSpread: 0.5, A: 140, k: 1.5, T: 300, dt: 0.5, jumpsPerEpisode: 12, episodes: 400 };
+    this.params = { sigma: 2, halfSpread: 0.5, A: 140, k: 1.5, T: 1, dt: 0.005, jumpsPerEpisode: 10, episodes: 250 };
 
-    const sl = makeSlider({ label: 'latency τ (s)', min: 0, max: 2.0, step: 0.05, value: 0.3, format: (v) => v.toFixed(2), onChange: () => this.run() });
-    const sj = makeSlider({ label: 'jumps per episode', min: 0, max: 60, step: 2, value: this.params.jumpsPerEpisode, format: (v) => v.toFixed(0), onChange: (v) => { this.params.jumpsPerEpisode = v; this.run(); } });
-    const ss = makeSlider({ label: 'volatility σ', min: 0.1, max: 2, step: 0.05, value: this.params.sigma, format: (v) => v.toFixed(2), onChange: (v) => { this.params.sigma = v; this.run(); } });
+    const sl = makeSlider({ label: 'latency τ', min: 0, max: 0.1, step: 0.002, value: 0.01, format: (v) => v.toFixed(3), onChange: () => this.run() });
+    const sj = makeSlider({ label: 'jumps per episode', min: 0, max: 40, step: 2, value: this.params.jumpsPerEpisode, format: (v) => v.toFixed(0), onChange: (v) => { this.params.jumpsPerEpisode = v; this.run(); } });
+    const ss = makeSlider({ label: 'volatility σ', min: 0.1, max: 4, step: 0.1, value: this.params.sigma, format: (v) => v.toFixed(1), onChange: (v) => { this.params.sigma = v; this.run(); } });
 
     this.sl = sl;
     this.readout = makeReadout([
@@ -99,7 +99,7 @@ export default class Latency {
     spinner(viz, true);
     requestAnimationFrame(() => {
       const taus = [];
-      for (let t = 0; t <= 2.0; t += 0.1) taus.push(parseFloat(t.toFixed(2)));
+      for (let t = 0; t <= 0.1; t += 0.005) taus.push(parseFloat(t.toFixed(4)));
       const meanPnl = [], analytic = [];
       const ep = this.params.episodes;
       for (const tau of taus) {
