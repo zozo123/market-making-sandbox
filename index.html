@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market-Making Sandbox</title>
+  <meta name="description" content="An interactive, scroll-driven explainer for market making — from the order book to Avellaneda-Stoikov, Glosten-Milgrom, and Kyle's lambda." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">Market-Making Sandbox</div>
+      <h1>How market making actually works</h1>
+      <p>An interactive, scroll-driven explainer. Each section is a live simulation: drag the sliders, watch the order book breathe, the inventory drift, the P&amp;L distribution narrow once you skew. From the limit order book to Avellaneda&ndash;Stoikov, Glosten&ndash;Milgrom, and Kyle's $\lambda$.</p>
+      <div class="meta">
+        Sibling to <a href="https://zozo123.github.io/microprice-sandbox/" target="_blank" rel="noopener">microprice-sandbox</a> &middot; <a href="https://github.com/" id="repo-link" target="_blank" rel="noopener">source</a>
+      </div>
+
+      <nav class="toc" aria-label="sections">
+        <a href="#s01"><span class="num-tag">01</span>Order book</a>
+        <a href="#s02"><span class="num-tag">02</span>Naive market maker</a>
+        <a href="#s03"><span class="num-tag">03</span>Inventory risk</a>
+        <a href="#s04"><span class="num-tag">04</span>Skew</a>
+        <a href="#s05"><span class="num-tag">05</span>Spread vs fills</a>
+        <a href="#s06"><span class="num-tag">06</span>Adverse selection</a>
+        <a href="#s07"><span class="num-tag">07</span>Avellaneda&ndash;Stoikov</a>
+        <a href="#s08"><span class="num-tag">08</span>Queue position</a>
+        <a href="#s09"><span class="num-tag">09</span>Latency</a>
+        <a href="#s10"><span class="num-tag">10</span>Hedging</a>
+        <a href="#s11"><span class="num-tag">11</span>Glosten&ndash;Milgrom</a>
+        <a href="#s12"><span class="num-tag">12</span>Kyle's $\lambda$</a>
+        <a href="#s13"><span class="num-tag">13</span>Microprice</a>
+      </nav>
+    </header>
+
+    <section class="card" id="s01" data-widget="01-orderbook">
+      <div class="section-head"><span class="idx">01</span><h2>The limit order book</h2></div>
+      <p class="lede">Everything starts here. Buyers post bids, sellers post asks; the best bid and best ask sandwich the spread. Orders arrive, get filled, get cancelled. The market maker's job is to <em>sit in the book</em> on both sides and earn the spread without getting run over by directional flow.</p>
+      <div class="widget"><div class="controls"></div><div class="viz tight"></div></div>
+      <div class="insight"><strong>Why it matters:</strong> The book is the data structure every model in this page assumes. Mid-price, micro-price, and depth are the three numbers a maker reads off it constantly.</div>
+    </section>
+
+    <section class="card" id="s02" data-widget="02-naive-mm">
+      <div class="section-head"><span class="idx">02</span><h2>The naive market maker</h2></div>
+      <p class="lede">Simplest possible strategy: quote at mid $\pm\,\delta$ and wait. Buy orders hit your ask, sell orders hit your bid. Each round-trip earns you the full spread $2\delta$.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>The catch:</strong> with no inventory management, this works only if price stays still. The next section breaks that assumption.</div>
+    </section>
+
+    <section class="card" id="s03" data-widget="03-inventory-risk">
+      <div class="section-head"><span class="idx">03</span><h2>Inventory risk</h2></div>
+      <p class="lede">Now let the mid price diffuse. Your P&amp;L is spread capture <em>plus</em> $q \cdot \Delta s$ where $q$ is your inventory. Inventory and price moves are now what blows you up.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>The distribution widens.</strong> Mean P&amp;L might stay positive, but the tails are owned by inventory drift.</div>
+    </section>
+
+    <section class="card" id="s04" data-widget="04-skew">
+      <div class="section-head"><span class="idx">04</span><h2>Skew the quotes</h2></div>
+      <p class="lede">Push quotes by $-\gamma\,q$: when long, lower both quotes so you sell faster than you buy. A linear rule already mean-reverts inventory hard.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>Inventory tames itself.</strong> P&amp;L histogram narrows dramatically; mean barely moves.</div>
+    </section>
+
+    <section class="card" id="s05" data-widget="05-spread-vs-fills">
+      <div class="section-head"><span class="idx">05</span><h2>Spread vs. fill rate</h2></div>
+      <p class="lede">Wider spreads earn more per fill but get fewer fills. Fill intensity decays roughly exponentially in distance from mid: $\lambda(\delta) = A\,e^{-k\delta}$. There's an interior optimum.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>It's a U-curve.</strong> Past the peak, every extra basis point of spread costs more in lost fills than it earns.</div>
+    </section>
+
+    <section class="card" id="s06" data-widget="06-adverse-selection">
+      <div class="section-head"><span class="idx">06</span><h2>Adverse selection</h2></div>
+      <p class="lede">Not all flow is equal. A fraction of trades arrives <em>because</em> the price is about to move against your quote. They look identical to noise on arrival — and they cost you.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>Toxicity tax.</strong> As informed share rises, the maker's P&amp;L distribution shifts left even with symmetric spreads.</div>
+    </section>
+
+    <section class="card" id="s07" data-widget="07-avellaneda-stoikov">
+      <div class="section-head"><span class="idx">07</span><h2>Avellaneda&ndash;Stoikov</h2></div>
+      <p class="lede">The optimal-control answer to skew + spread, jointly. The maker maximizes expected utility of terminal wealth under inventory risk. Two famous formulas drop out:</p>
+      <div class="eq">$$r(s, q, t) = s - q\,\gamma\,\sigma^{2}(T - t)$$</div>
+      <div class="eq">$$\delta^{*} = \tfrac{1}{2}\gamma\,\sigma^{2}(T - t) + \tfrac{1}{\gamma}\,\ln\!\Big(1 + \tfrac{\gamma}{k}\Big)$$</div>
+      <p class="lede">$r$ is the <em>reservation price</em> — the mid you actually quote around once inventory bias is in. $\delta^{*}$ is the optimal half-spread.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>It just works.</strong> Inventory std shrinks ~2× vs symmetric, mean P&amp;L is comparable — the whole point is variance.</div>
+    </section>
+
+    <section class="card" id="s08" data-widget="08-queue-position">
+      <div class="section-head"><span class="idx">08</span><h2>Queue position</h2></div>
+      <p class="lede">At a price level, fills are FIFO. Your position in the queue matters: orders ahead get filled first, but they also bear the adverse selection first when the level is about to clear.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>Queue position is information.</strong> Front of queue = more fills but worse conditional P&amp;L.</div>
+    </section>
+
+    <section class="card" id="s09" data-widget="09-latency">
+      <div class="section-head"><span class="idx">09</span><h2>Latency</h2></div>
+      <p class="lede">A maker's quotes are only as fresh as her connection. While she's updating, the world moves and stale quotes get picked off.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>The latency tax is convex.</strong> Speed is bought at the margin to avoid getting sniped on jumps.</div>
+    </section>
+
+    <section class="card" id="s10" data-widget="10-hedging">
+      <div class="section-head"><span class="idx">10</span><h2>Hedging</h2></div>
+      <p class="lede">If asset $B$ correlates with the inventory you're forced to hold in $A$, hedge with $B$. The variance-minimizing ratio is</p>
+      <div class="eq">$$h^{*} = \rho\,\frac{\sigma_A}{\sigma_B}$$</div>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>Hedge until residual variance is convex around $h^{*}$.</strong> Anything left is the price of basis risk.</div>
+    </section>
+
+    <section class="card" id="s11" data-widget="11-glosten-milgrom">
+      <div class="section-head"><span class="idx">11</span><h2>Glosten&ndash;Milgrom</h2></div>
+      <p class="lede">Sequential trade model. The maker is uncertain about true value $V \in \{V_L, V_H\}$. Each arriving trade is either informed (knows $V$) or uninformed (random). The maker updates beliefs after every fill, and quotes</p>
+      <div class="eq">$$\text{ask} = \mathbb{E}[V \mid \text{buy}], \qquad \text{bid} = \mathbb{E}[V \mid \text{sell}]$$</div>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>Spread is a Bayesian premium.</strong> It exists even with no inventory cost: it's the maker's protection against being on the wrong side of an informed trade.</div>
+    </section>
+
+    <section class="card" id="s12" data-widget="12-kyle">
+      <div class="section-head"><span class="idx">12</span><h2>Kyle's $\lambda$</h2></div>
+      <p class="lede">A single-auction model with one informed trader, noise traders, and a competitive maker. Price impact is linear in net order flow $y$:</p>
+      <div class="eq">$$p = \mu + \lambda\,y, \qquad \lambda = \frac{\sigma_v}{2\,\sigma_u}$$</div>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>Depth is the inverse of information asymmetry.</strong> More noise traders dilute information; deeper markets ($1/\lambda$) absorb size with less impact.</div>
+    </section>
+
+    <section class="card" id="s13" data-widget="13-microprice">
+      <div class="section-head"><span class="idx">13</span><h2>Microprice</h2></div>
+      <p class="lede">A free signal on top of the book: weight the best bid and ask by the <em>opposite</em> side's size.</p>
+      <div class="eq">$$\text{microprice} = \text{ask}\cdot I + \text{bid}\cdot(1-I), \quad I = \frac{q_b}{q_b + q_a}$$</div>
+      <p class="lede">When the bid stack is thick, the next print is more likely at the ask — so the microprice leans up.</p>
+      <div class="widget"><div class="controls"></div><div class="viz"></div></div>
+      <div class="insight"><strong>Sibling project:</strong> <a href="https://zozo123.github.io/microprice-sandbox/" target="_blank" rel="noopener">microprice-sandbox</a> reproduces Avellaneda&ndash;Stoikov with this signal in the loop.</div>
+    </section>
+
+    <footer>
+      Built with vanilla JS, Plotly &amp; KaTeX. No backend, no telemetry. Code on
+      <a href="https://github.com/" id="repo-link-foot">GitHub</a>.
+    </footer>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
