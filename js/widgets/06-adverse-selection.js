@@ -76,10 +76,14 @@ export default class AdverseSelection {
       const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
       const m0 = mean(baseline), m1 = mean(toxic);
 
+      const all = [...baseline, ...toxic];
+      const lo = Math.min(...all), hi = Math.max(...all);
+      const xbins = { start: lo, end: hi, size: (hi - lo) / 50 };
+
       Plotly.react(this.plotEl, [
-        { x: [...baseline], type: 'histogram', name: 'α = 0',                     marker: { color: '#2dd4bf', opacity: 0.55 }, nbinsx: 40 },
-        { x: [...toxic],    type: 'histogram', name: 'α = ' + this.params.alpha.toFixed(2), marker: { color: '#fb7185', opacity: 0.7  }, nbinsx: 40 },
-      ], plotlyTheme({ barmode: 'overlay', bargap: 0.02, showlegend: true, legend: { x: 0.02, y: 0.98, font: { color: '#8b97ad' } },
+        { x: [...baseline], type: 'histogram', name: 'α = 0',                     marker: { color: '#2dd4bf', opacity: 0.5, line: { color: '#2dd4bf', width: 1 } }, xbins, autobinx: false },
+        { x: [...toxic],    type: 'histogram', name: 'α = ' + this.params.alpha.toFixed(2), marker: { color: '#fb7185', opacity: 0.6, line: { color: '#fb7185', width: 1 } }, xbins, autobinx: false },
+      ], plotlyTheme({ barmode: 'overlay', bargap: 0.02, showlegend: true, legend: { x: 0.02, y: 0.98, font: { color: '#a8b5c8' } },
         xaxis: { gridcolor: '#232c3b', title: 'episode P&L', titlefont: { size: 11 } },
         yaxis: { gridcolor: '#232c3b', title: 'count', titlefont: { size: 11 } },
       }), plotlyConfig);

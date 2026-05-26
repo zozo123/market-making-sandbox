@@ -68,13 +68,16 @@ export default class Latency {
     const viz = $viz(this.section);
     this.params = { sigma: 2, halfSpread: 0.5, A: 140, k: 1.5, T: 1, dt: 0.005, jumpsPerEpisode: 10, episodes: 250 };
 
-    const sl = makeSlider({ label: 'latency τ', min: 0, max: 0.1, step: 0.002, value: 0.01, format: (v) => v.toFixed(3), onChange: () => this.run() });
+    const sl = makeSlider({ label: 'your latency τ', min: 0, max: 0.1, step: 0.002, value: 0.02, format: (v) => v.toFixed(3), onChange: (v) => { this.tau = v; this.draw(); } });
     const sj = makeSlider({ label: 'jumps per episode', min: 0, max: 40, step: 2, value: this.params.jumpsPerEpisode, format: (v) => v.toFixed(0), onChange: (v) => { this.params.jumpsPerEpisode = v; this.run(); } });
     const ss = makeSlider({ label: 'volatility σ', min: 0.1, max: 4, step: 0.1, value: this.params.sigma, format: (v) => v.toFixed(1), onChange: (v) => { this.params.sigma = v; this.run(); } });
 
     this.sl = sl;
+    this.tau = 0.02;
     this.readout = makeReadout([
-      { key: 'latency tax',  value: '—', cls: 'warn' },
+      { key: 'P&L at τ=0',    value: '—' },
+      { key: 'P&L at your τ', value: '—', cls: 'warn' },
+      { key: 'tax at your τ', value: '—', cls: 'warn' },
     ]);
     const runBtn = makeButton('re-sweep', () => this.run());
 
@@ -109,20 +112,40 @@ export default class Latency {
         const lossPerJump = expectedLatencyLoss(this.params.sigma, tau, this.params.halfSpread);
         analytic.push(meanPnl[0] - lossPerJump * this.params.jumpsPerEpisode);
       }
-
-      Plotly.react(this.plotEl, [
-        { x: taus, y: meanPnl, type: 'scatter', mode: 'lines', name: 'measured mean P&L', line: { color: '#2dd4bf', width: 2 } },
-        { x: taus, y: analytic, type: 'scatter', mode: 'lines', name: 'analytic', line: { color: '#fb7185', dash: 'dot', width: 2 } },
-      ], plotlyTheme({
-        showlegend: true, legend: { x: 0.55, y: 0.98, font: { color: '#8b97ad', size: 10 } },
-        xaxis: { gridcolor: '#232c3b', title: 'latency τ', titlefont: { size: 11 } },
-        yaxis: { gridcolor: '#232c3b', title: 'mean P&L', titlefont: { size: 11 } },
-      }), plotlyConfig);
-
-      const slowI = taus.length - 1;
-      this.readout.set('latency tax', (meanPnl[0] - meanPnl[slowI]).toFixed(2), 'v warn');
+      this.sweep = { taus, meanPnl, analytic };
+      this.draw();
       spinner(viz, false);
     });
+  }
+
+  draw() {
+    if (!this.sweep) return;
+    const { taus, meanPnl, analytic } = this.sweep;
+    // Linear interp at user's tau
+    const tau = this.tau;
+    let pnlAtTau = meanPnl[meanPnl.length - 1];
+    for (let i = 0; i < taus.length - 1; i++) {
+      if (tau >= taus[i] && tau <= taus[i+1]) {
+        const a = (tau - taus[i]) / (taus[i+1] - taus[i]);
+        pnlAtTau = meanPnl[i] * (1 - a) + meanPnl[i+1] * a;
+        break;
+      }
+    }
+
+    Plotly.react(this.plotEl, [
+      { x: taus, y: meanPnl, type: 'scatter', mode: 'lines', name: 'measured mean P&L', line: { color: '#2dd4bf', width: 2 } },
+      { x: taus, y: analytic, type: 'scatter', mode: 'lines', name: 'analytic', line: { color: '#fb7185', dash: 'dot', width: 2 } },
+      { x: [tau, tau], y: [Math.min(...meanPnl, ...analytic), Math.max(...meanPnl, ...analytic)], type: 'scatter', mode: 'lines', line: { color: '#a8b5c8', width: 1, dash: 'dash' }, name: 'your τ', hoverinfo: 'skip' },
+      { x: [tau], y: [pnlAtTau], type: 'scatter', mode: 'markers', marker: { color: '#fbbf24', size: 10, symbol: 'circle-open', line: { width: 2 } }, name: 'your P&L', hoverinfo: 'skip' },
+    ], plotlyTheme({
+      showlegend: true, legend: { x: 0.55, y: 0.98, font: { color: '#a8b5c8', size: 10 } },
+      xaxis: { gridcolor: '#232c3b', title: 'latency τ', titlefont: { size: 11 } },
+      yaxis: { gridcolor: '#232c3b', title: 'mean P&L', titlefont: { size: 11 } },
+    }), plotlyConfig);
+
+    this.readout.set('P&L at τ=0', meanPnl[0].toFixed(2));
+    this.readout.set('P&L at your τ', pnlAtTau.toFixed(2));
+    this.readout.set('tax at your τ', (meanPnl[0] - pnlAtTau).toFixed(2), 'v warn');
   }
   destroy() {}
 }

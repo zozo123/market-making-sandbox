@@ -96,7 +96,7 @@ export default class QueuePosition {
         { x: [Qs[bestI]], y: [total[bestI]], yaxis: 'y2', type: 'scatter', mode: 'markers', marker: { color: '#2dd4bf', size: 10, symbol: 'circle-open', line: { width: 2 } }, name: 'best Q' },
       ], plotlyTheme({
         showlegend: true,
-        legend: { x: 0.55, y: 0.98, font: { color: '#8b97ad', size: 10 } },
+        legend: { x: 0.55, y: 0.4, font: { color: '#a8b5c8', size: 10 } },
         xaxis: { gridcolor: '#232c3b', title: 'queue depth ahead Q', titlefont: { size: 11 } },
         yaxis: { gridcolor: '#232c3b', title: 'fill rate', side: 'left', titlefont: { size: 11 } },
         yaxis2: { overlaying: 'y', side: 'right', title: 'P&L', titlefont: { size: 11 }, gridcolor: 'rgba(0,0,0,0)' },

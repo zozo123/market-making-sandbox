@@ -100,10 +100,14 @@ export default class Skew {
       const sb = stats(base.pnl);
       const ss = stats(skewed.pnl);
 
+      const all = [...base.pnl, ...skewed.pnl];
+      const lo = Math.min(...all), hi = Math.max(...all);
+      const xbins = { start: lo, end: hi, size: (hi - lo) / 50 };
+
       Plotly.react(this.plotEl, [
-        { x: [...base.pnl],    type: 'histogram', name: 'γ = 0',        marker: { color: '#fb7185', opacity: 0.55 }, nbinsx: 40 },
-        { x: [...skewed.pnl],  type: 'histogram', name: 'γ = ' + this.params.gamma.toFixed(2), marker: { color: '#2dd4bf', opacity: 0.7 }, nbinsx: 40 },
-      ], plotlyTheme({ barmode: 'overlay', bargap: 0.02, showlegend: true, legend: { x: 0.02, y: 0.98, font: { color: '#8b97ad' } },
+        { x: [...base.pnl],    type: 'histogram', name: 'γ = 0',        marker: { color: '#fb7185', opacity: 0.5, line: { color: '#fb7185', width: 1 } }, xbins, autobinx: false },
+        { x: [...skewed.pnl],  type: 'histogram', name: 'γ = ' + this.params.gamma.toFixed(2), marker: { color: '#2dd4bf', opacity: 0.6, line: { color: '#2dd4bf', width: 1 } }, xbins, autobinx: false },
+      ], plotlyTheme({ barmode: 'overlay', bargap: 0.02, showlegend: true, legend: { x: 0.02, y: 0.98, font: { color: '#a8b5c8' } },
         xaxis: { gridcolor: '#232c3b', title: 'episode P&L', titlefont: { size: 11 } },
         yaxis: { gridcolor: '#232c3b', title: 'count', titlefont: { size: 11 } },
       }), plotlyConfig);

@@ -142,7 +142,7 @@ export default class OrderBookWidget {
     this.readout.set('best ask', bestAsk?.toFixed(2) ?? '—');
     this.readout.set('mid', mid.toFixed(3));
     this.readout.set('microprice', micro.toFixed(3));
-    this.readout.set('spread', (spread * 100).toFixed(1) + ' bp', I > 0.5 ? 'v good' : 'v');
+    this.readout.set('spread', (spread * 100).toFixed(1) + ' bp');
     this.readout.set('imbalance', I.toFixed(2), I > 0.55 ? 'v bid' : (I < 0.45 ? 'v ask' : 'v'));
 
     const maxSz = Math.max(

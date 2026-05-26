@@ -57,7 +57,7 @@ export default class AvellanedaStoikov {
     this.params = { gamma: 0.1, sigma: 2, k: 1.5, T: 1, dt: 0.005, A: 140, halfSpread: 0.5, episodes: 500 };
 
     const sg = makeSlider({ label: 'risk aversion γ', min: 0.01, max: 0.4, step: 0.01, value: this.params.gamma, format: (v) => v.toFixed(2), onChange: (v) => { this.params.gamma = v; } });
-    const ss = makeSlider({ label: 'volatility σ', min: 0.1, max: 4, step: 0.1, value: this.params.sigma, format: (v) => v.toFixed(1), onChange: (v) => { this.params.sigma = v; } });
+    const ss = makeSlider({ label: 'volatility σ', min: 0.1, max: 4, step: 0.05, value: this.params.sigma, format: (v) => v.toFixed(2), onChange: (v) => { this.params.sigma = v; } });
     const sk = makeSlider({ label: 'fill-decay k', min: 0.5, max: 4, step: 0.1, value: this.params.k, format: (v) => v.toFixed(1), onChange: (v) => { this.params.k = v; } });
     const sT = makeSlider({ label: 'horizon T', min: 0.2, max: 3, step: 0.1, value: this.params.T, format: (v) => v.toFixed(1), onChange: (v) => { this.params.T = v; } });
 
@@ -98,10 +98,15 @@ export default class AvellanedaStoikov {
       const stPnL_sym = stats(sym.pnl), stInv_sym = stats(sym.inv);
       const stPnL_as  = stats(as.pnl),  stInv_as  = stats(as.inv);
 
+      // Share bin edges so the histograms are directly comparable
+      const all = [...sym.pnl, ...as.pnl];
+      const lo = Math.min(...all), hi = Math.max(...all);
+      const xbins = { start: lo, end: hi, size: (hi - lo) / 50 };
+
       Plotly.react(this.plotEl, [
-        { x: [...sym.pnl], type: 'histogram', name: 'symmetric', marker: { color: '#fb7185', opacity: 0.55 }, nbinsx: 40 },
-        { x: [...as.pnl],  type: 'histogram', name: 'AS',        marker: { color: '#2dd4bf', opacity: 0.7  }, nbinsx: 40 },
-      ], plotlyTheme({ barmode: 'overlay', bargap: 0.02, showlegend: true, legend: { x: 0.02, y: 0.98, font: { color: '#8b97ad' } },
+        { x: [...sym.pnl], type: 'histogram', name: 'symmetric', marker: { color: '#fb7185', opacity: 0.5, line: { color: '#fb7185', width: 1 } }, xbins, autobinx: false },
+        { x: [...as.pnl],  type: 'histogram', name: 'AS',        marker: { color: '#2dd4bf', opacity: 0.6, line: { color: '#2dd4bf', width: 1 } }, xbins, autobinx: false },
+      ], plotlyTheme({ barmode: 'overlay', bargap: 0.02, showlegend: true, legend: { x: 0.02, y: 0.98, font: { color: '#a8b5c8' } },
         xaxis: { gridcolor: '#232c3b', title: 'terminal P&L', titlefont: { size: 11 } },
         yaxis: { gridcolor: '#232c3b', title: 'count', titlefont: { size: 11 } },
       }), plotlyConfig);
