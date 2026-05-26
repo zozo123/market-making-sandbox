@@ -1,6 +1,8 @@
-# Market-Making Sandbox
+# How market makers print money
 
-An interactive, scroll-driven explainer for market making. Each of the 13 sections is a live in-browser simulation: drag the sliders, watch the order book breathe, the inventory drift, the P&L distribution narrow once you skew. From the limit order book up through Avellaneda–Stoikov, Glosten–Milgrom, and Kyle's λ.
+Citadel Securities. Jane Street. Virtu. Optiver. Hudson River. A handful of electronic market-making firms clear **tens of billions of dollars a year** by quoting both sides of an order book and capturing the spread millions of times a day. In a Trump-era tape that re-prices on every tariff and every Fed leak, the spread machine runs hotter — volatility *is* their revenue.
+
+This is an interactive explainer. 13 live in-browser simulations walk you from the limit order book up through Avellaneda–Stoikov, Glosten–Milgrom, and Kyle's λ. Drag the sliders, watch the order book breathe, the inventory drift, the P&L distribution narrow once you skew.
 
 Live: **https://zozo123.github.io/market-making-sandbox/**
 
