@@ -66,7 +66,7 @@ export default class Latency {
   init() {
     const controls = $controls(this.section);
     const viz = $viz(this.section);
-    this.params = { sigma: 2, halfSpread: 0.5, A: 140, k: 1.5, T: 1, dt: 0.005, jumpsPerEpisode: 10, episodes: 250 };
+    this.params = { sigma: 2, halfSpread: 0.5, A: 140, k: 1.5, T: 1, dt: 0.005, jumpsPerEpisode: 15, episodes: 500 };
 
     const sl = makeSlider({ label: 'your latency τ', min: 0, max: 0.1, step: 0.002, value: 0.02, format: (v) => v.toFixed(3), onChange: (v) => { this.tau = v; this.draw(); } });
     const sj = makeSlider({ label: 'jumps per episode', min: 0, max: 40, step: 2, value: this.params.jumpsPerEpisode, format: (v) => v.toFixed(0), onChange: (v) => { this.params.jumpsPerEpisode = v; this.run(); } });
