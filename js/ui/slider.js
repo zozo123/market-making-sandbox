@@ -11,7 +11,8 @@ export function makeSlider({ label, min, max, step, value, format = (v) => v.toF
   `;
   const input = el.querySelector('input');
   const val = el.querySelector('.val');
-  const update = (v) => { val.textContent = format(v); };
+  input.setAttribute('aria-label', el.querySelector('.label').textContent);
+  const update = (v) => { val.textContent = format(v); input.setAttribute('aria-valuetext', val.textContent); };
   update(value);
   input.addEventListener('input', () => {
     const v = parseFloat(input.value);
