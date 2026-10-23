@@ -1,8 +1,6 @@
-# How market makers print money
+# How market making works: an interactive sandbox
 
-Citadel Securities. Jane Street. Virtu. Optiver. Hudson River. A handful of electronic market-making firms clear **tens of billions of dollars a year** by quoting both sides of an order book and capturing the spread millions of times a day. In a Trump-era tape that re-prices on every tariff and every Fed leak, the spread machine runs hotter — volatility *is* their revenue.
-
-This is an interactive explainer. 13 live in-browser simulations walk you from the limit order book up through Avellaneda–Stoikov, Glosten–Milgrom, and Kyle's λ. Drag the sliders, watch the order book breathe, the inventory drift, the P&L distribution narrow once you skew.
+Electronic market makers quote both sides of an order book and earn the spread while managing inventory risk and adverse selection. This interactive explainer is 13 in-browser simulations, from the limit order book to Avellaneda–Stoikov, Glosten–Milgrom, and Kyle's λ. Drag the sliders to see each effect.
 
 Live: **https://zozo123.github.io/market-making-sandbox/**
 
@@ -14,7 +12,7 @@ Sibling to [microprice-sandbox](https://github.com/zozo123/microprice-sandbox).
 2. **The naive market maker** — quote ±δ, capture spread.
 3. **Inventory risk** — turn on a Brownian mid; watch the P&L distribution widen.
 4. **Skew the quotes** — shift by −γq; inventory mean-reverts.
-5. **Spread vs. fill rate** — the U-curve in δ.
+5. **Spread vs. fill rate** — P&L vs half-spread δ has an interior (inverted-U) optimum.
 6. **Adverse selection** — informed flow drags P&L left.
 7. **Avellaneda–Stoikov** — optimal reservation price + δ*; Monte Carlo against the symmetric baseline.
 8. **Queue position** — fill rate vs conditional P&L as you sit deeper in the FIFO queue.
@@ -47,4 +45,4 @@ Every widget exposes a `Widget` class with `init()` / `destroy()`, mounted as th
 
 ## License
 
-MIT.
+[MIT](LICENSE) © 2026 Yossi Eliaz.
